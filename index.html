@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<title>Мои тренировки</title>
+<style>
+:root{
+  --bg:#000;--bg2:#0c0d10;--card:#141519;--card2:#1c1e24;--line:#26282f;
+  --txt:#f2f3f5;--mut:#8b8f99;--mut2:#5d616b;--acc:#ff4d3d;--acc2:#ff7a45;
+  --ok:#37d67a;--rest:#3aa0ff;--r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:84px;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+.hide{display:none!important}
+img{display:block}
+
+header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,#000 55%,rgba(0,0,0,.82));backdrop-filter:blur(12px);padding:14px 0 10px}
+.h-title{font-size:30px;font-weight:800;letter-spacing:-.5px}
+.h-sub{color:var(--mut);font-size:13px;margin-top:2px}
+
+.search{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin-top:12px}
+.search input{background:none;border:none;color:var(--txt);font-size:16px;width:100%;outline:none}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:8px 15px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--mut);font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.15s}
+.chip.on{background:var(--txt);color:#000;border-color:var(--txt)}
+
+.sec-title{font-size:20px;font-weight:800;margin:24px 0 12px;letter-spacing:-.3px}
+.sec-title .cnt{color:var(--mut);font-weight:600;font-size:15px;margin-left:6px}
+
+/* generator */
+.note{background:linear-gradient(135deg,rgba(255,77,61,.16),rgba(255,122,69,.07));border:1px solid rgba(255,122,69,.25);border-radius:var(--r);padding:15px 16px;font-size:14px;line-height:1.5;color:#ffd9cf}
+.note b{color:#fff}
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.opt{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;cursor:pointer;transition:.12s;display:flex;align-items:center;gap:11px}
+.opt:active{transform:scale(.98)}
+.opt.on{border-color:var(--acc);background:rgba(255,77,61,.1)}
+.opt .em{font-size:22px;flex:none}
+.opt .t{font-size:15px;font-weight:700;line-height:1.15}
+.opt .s{color:var(--mut);font-size:12px;margin-top:1px}
+.opt.on .t{color:#fff}
+.row-opts{display:flex;gap:8px;flex-wrap:wrap}
+.pill-opt{flex:1;min-width:64px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px;cursor:pointer;font-weight:700;font-size:15px;transition:.12s}
+.pill-opt.on{border-color:var(--acc);background:rgba(255,77,61,.12);color:#fff}
+.pill-opt .s{display:block;color:var(--mut);font-size:11px;font-weight:600;margin-top:2px}
+.pill-opt.on .s{color:var(--acc2)}
+
+.gen-btn{width:100%;border:none;border-radius:16px;padding:17px;font-size:17px;font-weight:800;background:var(--acc);color:#fff;cursor:pointer;box-shadow:0 8px 30px rgba(255,77,61,.32);margin-top:18px}
+.gen-btn:active{transform:scale(.99)}
+
+/* exercise card in plan */
+.ex{display:flex;gap:13px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;cursor:pointer;transition:.12s}
+.ex:active{transform:scale(.99)}
+.ex .thumb{width:74px;height:74px;border-radius:12px;flex:none;object-fit:cover;background:var(--card2)}
+.ex .ph{width:74px;height:74px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:30px;background:var(--card2)}
+.ex .nm{font-size:15px;font-weight:700;line-height:1.2}
+.ex .mt{color:var(--mut);font-size:12.5px;margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ex .badge{background:var(--card2);border-radius:6px;padding:2px 7px;font-size:11px;font-weight:600;color:var(--mut)}
+.ex .sets{margin-left:8px;text-align:right;flex:none;padding-right:4px;max-width:96px}
+.ex .sets .v{font-size:17px;font-weight:800;color:var(--acc2);white-space:nowrap}
+.ex .sets .l{font-size:11px;color:var(--mut);white-space:nowrap}
+.plan-list{display:flex;flex-direction:column;gap:10px}
+.block-h{display:flex;align-items:center;gap:9px;margin:20px 0 10px}
+.block-h .ic{font-size:18px}
+.block-h .t{font-size:16px;font-weight:800}
+.block-h .l{color:var(--mut);font-size:13px;margin-left:auto}
+
+.cards{display:flex;flex-direction:column;gap:11px}
+
+nav{position:fixed;bottom:0;left:0;right:0;z-index:40;background:rgba(8,8,10,.92);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--mut2);font-size:11px;font-weight:600;cursor:pointer;background:none;border:none;padding:4px}
+.nbtn.on{color:var(--acc)}
+.nbtn svg{width:24px;height:24px}
+
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--mut);font-size:15px;font-weight:600;cursor:pointer;margin:14px 0 6px}
+.startbtn{position:fixed;bottom:calc(84px + env(safe-area-inset-bottom));left:0;right:0;z-index:35;padding:0 16px}
+.startbtn .inner{max-width:760px;margin:0 auto}
+.startbtn button{width:100%;border:none;border-radius:16px;padding:17px;font-size:17px;font-weight:800;background:var(--acc);color:#fff;cursor:pointer;box-shadow:0 8px 30px rgba(255,77,61,.35)}
+
+/* exercise detail */
+.exhero{width:100%;height:280px;object-fit:cover;border-radius:20px;background:var(--card2)}
+.exph{width:100%;height:220px;border-radius:20px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:80px}
+.kv{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.kv .pill{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 13px;font-size:13px;font-weight:600}
+.kv .pill span{color:var(--mut);font-weight:500}
+.instr{margin-top:18px;display:flex;flex-direction:column;gap:11px}
+.instr .step{display:flex;gap:12px;font-size:14.5px;line-height:1.5;color:#dfe1e6}
+.instr .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--card2);color:var(--acc2);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+
+/* library grid */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.gc{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;transition:.12s}
+.gc:active{transform:scale(.98)}
+.gc .im{width:100%;aspect-ratio:1;object-fit:cover;background:var(--card2)}
+.gc .ph{width:100%;aspect-ratio:1;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:42px}
+.gc .b{padding:10px 11px}
+.gc .nm{font-size:13.5px;font-weight:700;line-height:1.2}
+.gc .mt{color:var(--mut);font-size:11.5px;margin-top:4px}
+
+/* player */
+#player{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column}
+.p-top{padding:14px 18px 8px;display:flex;align-items:center;gap:14px}
+.p-close{background:var(--card);border:1px solid var(--line);color:var(--txt);width:38px;height:38px;border-radius:11px;font-size:18px;cursor:pointer;flex:none}
+.p-prog{flex:1;height:6px;background:var(--card2);border-radius:99px;overflow:hidden}
+.p-prog i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
+.p-cnt{color:var(--mut);font-size:13px;font-weight:700;flex:none;font-variant-numeric:tabular-nums}
+.p-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:6px 22px;overflow:auto}
+.p-img{width:min(86vw,360px);height:240px;object-fit:cover;border-radius:20px;margin:6px 0 4px;background:var(--card2)}
+.p-imgph{width:min(86vw,360px);height:200px;border-radius:20px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:74px;margin:6px 0}
+.p-phase{font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--acc2)}
+.p-phase.rest{color:var(--rest)}
+.p-set{color:var(--mut);font-size:14px;font-weight:600;margin-top:8px}
+.p-name{font-size:27px;font-weight:800;line-height:1.15;letter-spacing:-.4px;margin:8px 0 2px;max-width:520px}
+.p-big{font-size:58px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;margin-top:4px}
+.p-reps{font-size:50px;font-weight:800;margin-top:4px}
+.p-u{color:var(--mut);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.p-next{color:var(--mut);font-size:13.5px;margin-top:10px}.p-next b{color:var(--txt)}
+.p-ctrl{display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 22px calc(24px + env(safe-area-inset-bottom))}
+.p-side{width:58px;height:58px;border-radius:50%;background:var(--card);border:1px solid var(--line);color:var(--txt);font-size:19px;cursor:pointer;font-weight:800}
+.p-main{flex:1;max-width:260px;height:62px;border-radius:18px;border:none;background:var(--acc);color:#fff;font-size:18px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.p-main.rest{background:var(--rest)}.p-main.pause{background:var(--card2);border:1px solid var(--line)}
+.p-done{text-align:center;padding:36px 22px}.p-done .em{font-size:72px}
+.p-done h2{font-size:28px;font-weight:800;margin:12px 0 6px}.p-done p{color:var(--mut);font-size:15px}
+.p-done .ds{display:flex;gap:12px;justify-content:center;margin:22px 0}
+.p-done .ds div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 17px}
+.p-done .ds .v{font-size:23px;font-weight:800}.p-done .ds .l{color:var(--mut);font-size:11px}
+
+.empty{text-align:center;color:var(--mut);padding:50px 20px;font-size:15px}
+.fade{animation:fade .32s}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav id="nav">
+  <button class="nbtn on" data-tab="build">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg>
+    Тренировка
+  </button>
+  <button class="nbtn" data-tab="lib">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    Упражнения
+  </button>
+</nav>
+<div id="player" class="hide"></div>
+
+<script src="appdata.js"></script>
+<script>
+const EX = window.EXDATA.exercises;
+const IMAGED = EX.filter(x=>x.img);
+const app=document.getElementById('app');
+
+/* ---- maps ---- */
+const FOCUS={
+  full:{ru:'Всё тело',em:'🔥',regions:['legs','back','chest','shoulders','arms','core']},
+  upper:{ru:'Верх тела',em:'💪',regions:['chest','back','shoulders','arms']},
+  lower:{ru:'Низ тела',em:'🦵',regions:['legs','core']},
+  push:{ru:'Толкающие',em:'➡️',regions:['chest','shoulders','arms']},
+  pull:{ru:'Тянущие',em:'⬅️',regions:['back','arms']},
+  core:{ru:'Пресс / кор',em:'🎯',regions:['core']},
+  hiit:{ru:'Кардио / HIIT',em:'⚡',regions:['legs','core','cardio']},
+};
+const REGION_RU=window.EXDATA.regionRu;
+const REGION_EM={legs:'🦵',back:'🪢',chest:'🫁',shoulders:'🤚',arms:'💪',core:'🎯',mobility:'🧘',cardio:'⚡',full:'🔥'};
+
+/* ---- state ---- */
+let st={tab:'build', focus:'full', dur:20, equip:'any', level:'any', plan:null, view:null, libFilter:'all', q:''};
+
+/* ---- helpers ---- */
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function plural(n,a,b,c){const t=n%10,h=n%100;if(t===1&&h!==11)return a;if(t>=2&&t<=4&&(h<10||h>=20))return b;return c}
+
+/* ---- equipment filter ---- */
+function equipOk(x){
+  if(st.equip==='any')return true;
+  if(st.equip==='home') return ['Свой вес','Гантели','Гиря','Резинка','Фитбол','—'].includes(x.equip);
+  if(st.equip==='body') return ['Свой вес','—'].includes(x.equip);
+  return true;
+}
+
+/* ---- workout generator (personalized) ---- */
+function generate(){
+  const f=FOCUS[st.focus];
+  const pool=IMAGED.filter(equipOk);
+  const byRegion=r=>shuffle(pool.filter(x=>x.region===r && x.kind!=='stretch'));
+  // duration → number of main exercises
+  const mainCount={10:3,20:5,30:6,45:8}[st.dur];
+  const isHiit=st.focus==='hiit';
+  // build main list, round-robin across focus regions, compound-first
+  let buckets=f.regions.map(r=>byRegion(r)).filter(b=>b.length);
+  // sort each bucket: compound first
+  buckets.forEach(b=>b.sort((a,b2)=>(a.mech==='compound'?-1:0)-(b2.mech==='compound'?-1:0)));
+  const main=[]; let gi=0, guard=0;
+  while(main.length<mainCount && guard<200){
+    const b=buckets[gi%buckets.length];
+    if(b&&b.length){const e=b.shift(); if(!main.includes(e))main.push(e);}
+    gi++;guard++;
+    if(buckets.every(b=>!b.length))break;
+  }
+  // warmup: 2-3 mobility/stretch + dynamic
+  const mob=shuffle(IMAGED.filter(x=>x.kind==='stretch'));
+  const warm=mob.slice(0,st.dur<=10?2:3);
+  // finisher: core or plyo (skip if focus is core/hiit already core-heavy)
+  let fin=[];
+  if(!isHiit && st.focus!=='core' && st.dur>=20){
+    fin=shuffle(pool.filter(x=>x.region==='core'&&x.kind!=='stretch')).slice(0,1);
+  }
+  if(isHiit){
+    const plyo=shuffle(pool.filter(x=>x.kind==='plyo'||x.kind==='cardio'));
+    fin=plyo.slice(0,2);
+  }
+  // cooldown: 2 stretch
+  const cool=mob.slice(3,5);
+
+  // assign sets/reps per profile (short, moderate)
+  const repScheme=isHiit?{sets:3,reps:null,time:40,rest:20}:
+    st.dur<=10?{sets:2,reps:12,rest:45}:
+    st.dur>=45?{sets:4,reps:10,rest:75}:{sets:3,reps:10,rest:60};
+
+  function mk(list,phase,opts){
+    return list.map(x=>({ex:x,phase, ...opts}));
+  }
+  const plan={
+    focus:st.focus, dur:st.dur,
+    blocks:[
+      {id:'warm',ic:'🔆',t:'Разминка',items:mk(warm,'warmup',{sets:1,time:40,rest:0})},
+      {id:'main',ic:'💪',t:isHiit?'Основной круг':'Основная часть',items:mk(main,'interval',repScheme)},
+      ...(fin.length?[{id:'fin',ic:isHiit?'⚡':'🎯',t:isHiit?'Финишер':'Финишер на пресс',items:mk(fin,'interval',isHiit?{sets:2,time:30,rest:20}:{sets:2,reps:15,rest:45})}]:[]),
+      {id:'cool',ic:'🧊',t:'Заминка / растяжка',items:mk(cool,'cooldown',{sets:1,time:40,rest:0})},
+    ]
+  };
+  plan.blocks=plan.blocks.filter(b=>b.items.length);
+  // est duration
+  let sec=0;
+  plan.blocks.forEach(b=>b.items.forEach(it=>{
+    const work=it.time?it.time:(it.reps?it.reps*3.5:30);
+    sec+=it.sets*(work+(it.rest||0));
+  }));
+  plan.est=Math.round(sec/60);
+  st.plan=plan;
+}
+
+/* ---- router ---- */
+function render(){
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.toggle('on',b.dataset.tab===st.tab));
+  if(st.view){renderExDetail(st.view);return;}
+  if(st.tab==='build'){ st.plan?renderPlan():renderBuild(); }
+  else renderLib();
+  if(!st.view)window.scrollTo(0,0);
+}
+
+/* ---- BUILD (generator) ---- */
+function renderBuild(){
+  const rec = `Под твой стиль: ты тренируешься <b>часто и коротко</b> (обычно 10–20 мин), любишь силовые, кор и кардио. Поэтому по умолчанию — <b>короткая эффективная тренировка</b>. Меняй параметры под настроение 👇`;
+  app.innerHTML=`
+  <header><div class="wrap">
+    <div class="h-title">Собрать тренировку</div>
+    <div class="h-sub">${IMAGED.length} упражнений с фото · персонально под тебя</div>
+  </div></header>
+  <div class="wrap fade">
+    <div class="note" style="margin-top:8px">${rec}</div>
+
+    <div class="sec-title">На что фокус?</div>
+    <div class="opt-grid">
+      ${Object.entries(FOCUS).map(([k,f])=>`
+        <div class="opt ${st.focus===k?'on':''}" data-focus="${k}">
+          <div class="em">${f.em}</div>
+          <div><div class="t">${f.ru}</div><div class="s">${f.regions.map(r=>REGION_RU[r]||r).slice(0,3).join(', ')}</div></div>
+        </div>`).join('')}
+    </div>
+
+    <div class="sec-title">Сколько времени?</div>
+    <div class="row-opts">
+      ${[10,20,30,45].map(d=>`<div class="pill-opt ${st.dur===d?'on':''}" data-dur="${d}">${d}<span class="s">минут</span></div>`).join('')}
+    </div>
+
+    <div class="sec-title">Инвентарь</div>
+    <div class="row-opts">
+      ${[['any','Всё','зал'],['home','Дом','гантели/резина'],['body','Свой вес','без инвентаря']].map(([k,a,b])=>`<div class="pill-opt ${st.equip===k?'on':''}" data-equip="${k}">${a}<span class="s">${b}</span></div>`).join('')}
+    </div>
+
+    <button class="gen-btn" id="gen">✦ Собрать тренировку</button>
+    <div style="height:30px"></div>
+  </div>`;
+  app.querySelectorAll('[data-focus]').forEach(e=>e.onclick=()=>{st.focus=e.dataset.focus;render()});
+  app.querySelectorAll('[data-dur]').forEach(e=>e.onclick=()=>{st.dur=+e.dataset.dur;render()});
+  app.querySelectorAll('[data-equip]').forEach(e=>e.onclick=()=>{st.equip=e.dataset.equip;render()});
+  document.getElementById('gen').onclick=()=>{generate();render()};
+}
+
+/* ---- PLAN view ---- */
+function renderPlan(){
+  const p=st.plan; const f=FOCUS[p.focus];
+  const total=p.blocks.reduce((s,b)=>s+b.items.length,0);
+  app.innerHTML=`
+  <div class="wrap fade">
+    <div class="back" id="back">‹ Изменить параметры</div>
+    <div style="display:flex;align-items:center;gap:13px;margin-top:4px">
+      <div style="font-size:34px">${f.em}</div>
+      <div>
+        <div style="font-size:25px;font-weight:800;letter-spacing:-.4px">${f.ru}</div>
+        <div style="color:var(--mut);font-size:14px;margin-top:2px">≈ ${p.est} мин · ${total} ${plural(total,'упражнение','упражнения','упражнений')}</div>
+      </div>
+      <button id="reroll" style="margin-left:auto;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:10px 14px;font-weight:700;font-size:13px;cursor:pointer">🔄 Другой<br>вариант</button>
+    </div>
+    ${p.blocks.map(b=>`
+      <div class="block-h"><span class="ic">${b.ic}</span><span class="t">${b.t}</span><span class="l">${b.items.length} ${plural(b.items.length,'упр','упр','упр')}</span></div>
+      <div class="plan-list">${b.items.map(planRow).join('')}</div>
+    `).join('')}
+    <div style="height:120px"></div>
+  </div>
+  <div class="startbtn"><div class="inner"><button id="start">▶ Начать тренировку</button></div></div>`;
+  document.getElementById('back').onclick=()=>{st.plan=null;render()};
+  document.getElementById('reroll').onclick=()=>{generate();render()};
+  document.getElementById('start').onclick=()=>startPlayer(p);
+  app.querySelectorAll('[data-ex]').forEach(el=>el.onclick=()=>{st.view=el.dataset.ex;render()});
+}
+function planRow(it){
+  const x=it.ex;
+  // compact main figure + small label that fits narrow screens
+  let big,lbl;
+  if(it.time){ big = it.sets>1?`${it.sets}×${it.time}с` : `${it.time}с`; lbl = it.rest?`отдых ${it.rest}с`:'без отдыха'; }
+  else { big = `${it.sets}×${it.reps}`; lbl = it.rest?`отдых ${it.rest}с`:''; }
+  return `<div class="ex" data-ex="${x.code}">
+    ${x.img?`<img class="thumb" src="${x.img}" loading="lazy">`:`<div class="ph">${REGION_EM[x.region]||'💪'}</div>`}
+    <div style="min-width:0;flex:1">
+      <div class="nm">${esc(x.ru)}</div>
+      <div class="mt"><span class="badge">${REGION_RU[x.region]||x.region}</span><span>${x.equip}</span></div>
+    </div>
+    <div class="sets"><div class="v">${big}</div><div class="l">${lbl}</div></div>
+  </div>`;
+}
+
+/* ---- LIBRARY ---- */
+function renderLib(){
+  const regions=['all','legs','back','chest','shoulders','arms','core','mobility'];
+  let list=IMAGED.filter(x=>st.libFilter==='all'||x.region===st.libFilter);
+  if(st.q){const q=st.q.toLowerCase();list=list.filter(x=>x.ru.toLowerCase().includes(q));}
+  app.innerHTML=`
+  <header><div class="wrap">
+    <div class="h-title">Упражнения</div>
+    <div class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      <input id="q" placeholder="Поиск упражнения" value="${esc(st.q)}">
+    </div>
+    <div class="chips">${regions.map(r=>`<div class="chip ${st.libFilter===r?'on':''}" data-r="${r}">${r==='all'?'Все':((REGION_EM[r]||'')+' '+(REGION_RU[r]||r))}</div>`).join('')}</div>
+  </div></header>
+  <div class="wrap fade">
+    <div class="sec-title">${list.length} ${plural(list.length,'упражнение','упражнения','упражнений')}</div>
+    <div class="grid" id="grid">${list.map(gcard).join('')||'<div class="empty">Ничего не найдено</div>'}</div>
+    <div style="height:30px"></div>
+  </div>`;
+  app.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{st.libFilter=c.dataset.r;render()});
+  const q=document.getElementById('q');
+  q.oninput=()=>{st.q=q.value;const qq=st.q.toLowerCase();
+    const l2=IMAGED.filter(x=>(st.libFilter==='all'||x.region===st.libFilter)&&(!qq||x.ru.toLowerCase().includes(qq)));
+    document.getElementById('grid').innerHTML=l2.map(gcard).join('')||'<div class="empty">Ничего не найдено</div>';
+    app.querySelector('.sec-title').textContent=`${l2.length} ${plural(l2.length,'упражнение','упражнения','упражнений')}`;
+    bindGrid();};
+  bindGrid();
+}
+function gcard(x){
+  return `<div class="gc" data-ex="${x.code}">
+    ${x.img?`<img class="im" src="${x.img}" loading="lazy">`:`<div class="ph">${REGION_EM[x.region]||'💪'}</div>`}
+    <div class="b"><div class="nm">${esc(x.ru)}</div><div class="mt">${REGION_RU[x.region]||x.region} · ${x.equip}</div></div>
+  </div>`;
+}
+function bindGrid(){app.querySelectorAll('[data-ex]').forEach(el=>el.onclick=()=>{st.view=el.dataset.ex;render()})}
+
+/* ---- EXERCISE DETAIL ---- */
+function renderExDetail(code){
+  const x=EX.find(e=>e.code===code);
+  app.innerHTML=`
+  <div class="wrap fade">
+    <div class="back" id="back">‹ Назад</div>
+    ${x.img?`<img class="exhero" src="${x.img}">`:`<div class="exph">${REGION_EM[x.region]||'💪'}</div>`}
+    <h1 style="font-size:24px;font-weight:800;margin:16px 0 0;line-height:1.2">${esc(x.ru)}</h1>
+    <div class="kv">
+      <div class="pill">🎯 ${REGION_RU[x.region]||x.region}<span> группа</span></div>
+      ${x.muscle&&x.muscle!=='—'?`<div class="pill">💪 ${esc(x.muscle)}<span> мышцы</span></div>`:''}
+      <div class="pill">🏋️ ${x.equip}<span> инвентарь</span></div>
+      ${x.level?`<div class="pill">📈 ${x.level}<span> уровень</span></div>`:''}
+    </div>
+    ${(x.instrRu&&x.instrRu.length)?`<div class="sec-title" style="margin-bottom:6px">Как выполнять</div>
+      <div class="instr">${x.instrRu.map((s,i)=>`<div class="step"><div class="n">${i+1}</div><div>${esc(s)}</div></div>`).join('')}</div>`
+      :`<div style="color:var(--mut);margin-top:16px;font-size:14px">Это упражнение из твоих тренировок Garmin. Техника — как в приложении часов.</div>`}
+    <div style="height:30px"></div>
+  </div>`;
+  document.getElementById('back').onclick=()=>{st.view=null;render()};
+}
+
+/* ---- PLAYER ---- */
+let P=null;
+function startPlayer(plan){
+  // flatten into per-set sequence
+  const seq=[];
+  plan.blocks.forEach(b=>{
+    b.items.forEach(it=>{
+      for(let s=1;s<=it.sets;s++){
+        seq.push({ex:it.ex,phase:it.phase,mode:it.time?'time':(it.reps?'reps':'time'),
+          val:it.time||it.reps||30,setCur:s,setTot:it.sets,block:b.t});
+        if(it.rest&&s<it.sets) seq.push({rest:true,val:it.rest});
+      }
+    });
+  });
+  P={plan,seq,i:0,timer:null,remain:0,paused:false,start:Date.now(),exCount:plan.blocks.reduce((s,b)=>s+b.items.length,0)};
+  document.getElementById('player').classList.remove('hide');
+  document.body.style.overflow='hidden';
+  showStep();
+}
+function closePlayer(){if(P&&P.timer)clearInterval(P.timer);P=null;document.getElementById('player').classList.add('hide');document.body.style.overflow=''}
+function beep(f=880,d=.12,v=.2){try{const a=beep.c||(beep.c=new(window.AudioContext||window.webkitAudioContext)());const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=f;o.type='sine';g.gain.value=v;o.start();g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d);o.stop(a.currentTime+d)}catch(e){}}
+function vib(m){try{navigator.vibrate&&navigator.vibrate(m)}catch(e){}}
+
+function showStep(){
+  const pl=document.getElementById('player');
+  if(P.i>=P.seq.length){showDone();return}
+  const s=P.seq[P.i], next=P.seq[P.i+1];
+  if(P.timer){clearInterval(P.timer);P.timer=null} P.paused=false;
+  const C=2*Math.PI*0; // not used
+  if(s.rest){
+    pl.innerHTML=playerShell(`
+      <div class="p-phase rest">Отдых</div>
+      <div class="p-imgph">😮‍💨</div>
+      <div class="p-name">Передохни</div>
+      <div class="p-big" id="big">${s.val}</div><div class="p-u">секунд</div>
+      <div class="p-next">${next?`Далее: <b>${esc(next.ex.ru)}</b>`:''}</div>`,
+      `<button class="p-side" id="prev">⏮</button>
+       <button class="p-main rest" id="main">Пропустить ⏭</button>
+       <button class="p-side" id="next">⏭</button>`);
+    runTimer(s.val,document.getElementById('big'),true);
+    document.getElementById('main').onclick=()=>step(1);
+  } else {
+    const x=s.ex;
+    const setTxt=s.setTot>1?`Подход ${s.setCur} из ${s.setTot}`:'';
+    const isTime=s.mode==='time';
+    pl.innerHTML=playerShell(`
+      <div class="p-phase">${esc(s.block)}</div>
+      ${x.img?`<img class="p-img" src="${x.img}">`:`<div class="p-imgph">${REGION_EM[x.region]||'💪'}</div>`}
+      <div class="p-name">${esc(x.ru)}</div>
+      ${setTxt?`<div class="p-set">${setTxt}</div>`:''}
+      ${isTime?`<div class="p-big" id="big">${s.val}</div><div class="p-u">секунд</div>`
+        :`<div class="p-reps">${s.val}</div><div class="p-u">повторений</div>`}
+      <div class="p-next">${next?(next.rest?`Далее: <b>отдых ${next.val}с</b>`:`Далее: <b>${esc(next.ex.ru)}</b>`):'Последнее!'}</div>`,
+      `<button class="p-side" id="prev">⏮</button>
+       <button class="p-main" id="main">${isTime?'❚❚ Пауза':'✓ Готово'}</button>
+       <button class="p-side" id="next">⏭</button>`);
+    if(isTime){
+      runTimer(s.val,document.getElementById('big'),false);
+      const m=document.getElementById('main');
+      m.onclick=()=>{P.paused=!P.paused;m.textContent=P.paused?'▶ Дальше':'❚❚ Пауза';m.classList.toggle('pause',P.paused)};
+    } else {
+      document.getElementById('main').onclick=()=>{beep(900,.1,.18);vib(70);step(1)};
+    }
+  }
+  document.getElementById('prev').onclick=()=>step(-1);
+  document.getElementById('next').onclick=()=>step(1);
+  document.getElementById('pclose').onclick=()=>{if(confirm('Завершить тренировку?'))closePlayer()};
+}
+function playerShell(body,ctrl){
+  return `<div class="p-top">
+    <button class="p-close" id="pclose">✕</button>
+    <div class="p-prog"><i style="width:${P.i/P.seq.length*100}%"></i></div>
+    <div class="p-cnt">${P.i+1}/${P.seq.length}</div>
+  </div>
+  <div class="p-body fade">${body}</div>
+  <div class="p-ctrl">${ctrl}</div>`;
+}
+function runTimer(total,el,isRest){
+  P.remain=total;
+  P.timer=setInterval(()=>{
+    if(P.paused)return;
+    P.remain-=0.1;
+    if(P.remain<=0){P.remain=0;el.textContent='0';clearInterval(P.timer);P.timer=null;beep(1100,.18,.25);vib(200);setTimeout(()=>step(1),200);return}
+    el.textContent=Math.ceil(P.remain);
+    const r=P.remain;
+    if(r<=3.05&&Math.abs(r-Math.round(r))<0.06&&r>0.5)beep(700,.08,.14);
+  },100);
+}
+function step(d){if(P.timer){clearInterval(P.timer);P.timer=null}P.i+=d;if(P.i<0)P.i=0;showStep()}
+function showDone(){
+  if(P.timer)clearInterval(P.timer);
+  const mins=Math.round((Date.now()-P.start)/60000);
+  beep(660,.15,.2);setTimeout(()=>beep(880,.15,.2),150);setTimeout(()=>beep(1100,.25,.22),300);vib([200,80,200]);
+  document.getElementById('player').innerHTML=`
+  <div class="p-top"><button class="p-close" id="pclose">✕</button><div class="p-prog"><i style="width:100%"></i></div><div class="p-cnt">✓</div></div>
+  <div class="p-body"><div class="p-done fade">
+    <div class="em">🎉</div><h2>Красава!</h2><p>Тренировка завершена</p>
+    <div class="ds">
+      <div><div class="v">${mins||1}</div><div class="l">минут</div></div>
+      <div><div class="v">${P.exCount}</div><div class="l">упражнений</div></div>
+      <div><div class="v">${FOCUS[P.plan.focus].ru}</div><div class="l">фокус</div></div>
+    </div>
+    <button class="p-main" style="margin:0 auto;max-width:280px" id="fin">Готово</button>
+  </div></div>`;
+  document.getElementById('pclose').onclick=closePlayer;
+  document.getElementById('fin').onclick=closePlayer;
+}
+
+/* ---- nav ---- */
+document.querySelectorAll('.nbtn').forEach(b=>b.onclick=()=>{st.tab=b.dataset.tab;st.view=null;st.q='';render()});
+render();
+</script>
+</body>
+</html>
